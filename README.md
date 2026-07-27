@@ -10,6 +10,10 @@ When publishing results obtained using the Hamaker software package, please cite
 
 U. Aschauer; O. Burgos-Montes; R. Moreno; P. Bowen, Journal of Dispersion Science and Technology, 32(4), 470-479 **(2011).**
 
+## Documentation
+
+The full user manual (theoretical background, built-in interaction models, and a guide to writing your own plug-in models) is available at [`docs/manual.md`](docs/manual.md).
+
 ## Requirements
 
 - **Java 21 or later** (JDK, not just a JRE — needed to build; any modern JRE 21+ works to just run it)
