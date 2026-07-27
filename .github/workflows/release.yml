@@ -42,8 +42,11 @@ jobs:
       - name: Extract version from tag
         shell: bash
         run: |
-          TAG=${GITHUB_REF#refs/tags/v}
-          echo "APP_VERSION=$TAG" >> "$GITHUB_ENV"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "APP_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          else
+            echo "APP_VERSION=0.0.0" >> "$GITHUB_ENV"
+          fi
 
       - name: Build jar with Maven
         run: mvn -B clean package
