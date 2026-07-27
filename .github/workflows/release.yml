@@ -19,6 +19,7 @@ jobs:
           - os: windows-latest
             jpackage-type: exe
             artifact-glob: "target/dist/*.exe"
+            artifact-name: Hamaker2-windows
           - os: macos-latest
             jpackage-type: dmg
             artifact-glob: "target/dist/*.dmg"
@@ -26,19 +27,20 @@ jobs:
           - os: macos-15-intel
             jpackage-type: dmg
             artifact-glob: "target/dist/*.dmg"
-            artifact-name: Hamaker2-macos-intel          
+            artifact-name: Hamaker2-macos-intel
           - os: ubuntu-latest
             jpackage-type: deb
             artifact-glob: "target/dist/*.deb"
+            artifact-name: Hamaker2-linux
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -47,11 +49,13 @@ jobs:
       - name: Extract version from tag
         shell: bash
         run: |
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            echo "APP_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            RAW="${GITHUB_REF_NAME#v}"
           else
-            echo "APP_VERSION=0.0.0" >> "$GITHUB_ENV"
+            RAW="0.0.0"
           fi
+          echo "Resolved APP_VERSION=$RAW"
+          echo "APP_VERSION=$RAW" >> "$GITHUB_ENV"
 
       - name: Build jar with Maven
         run: mvn -B clean package
