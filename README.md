@@ -12,7 +12,7 @@ U. Aschauer; O. Burgos-Montes; R. Moreno; P. Bowen, Journal of Dispersion Scienc
 
 ## Documentation
 
-The full user manual (theoretical background, built-in interaction models, and a guide to writing your own plug-in models) is available at [`docs/manual.md`](docs/manual.md).
+The full user manual (theoretical background, built-in interaction models, and a guide to writing your own plug-in models) is available at [`doc/manual.md`](doc/manual.md).
 
 ## Requirements
 
