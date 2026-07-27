@@ -20,18 +20,22 @@ jobs:
             jpackage-type: exe
             artifact-glob: "target/dist/*.exe"
             artifact-name: Hamaker2-windows
+            suffix: windows
           - os: macos-latest
             jpackage-type: dmg
             artifact-glob: "target/dist/*.dmg"
             artifact-name: Hamaker2-macos-arm64
+            suffix: macos-arm64
           - os: macos-15-intel
             jpackage-type: dmg
             artifact-glob: "target/dist/*.dmg"
             artifact-name: Hamaker2-macos-intel
+            suffix: macos-intel
           - os: ubuntu-latest
             jpackage-type: deb
             artifact-glob: "target/dist/*.deb"
             artifact-name: Hamaker2-linux
+            suffix: linux
 
     runs-on: ${{ matrix.os }}
 
@@ -73,6 +77,17 @@ jobs:
             --vendor "Uli Aschauer" \
             --type ${{ matrix.jpackage-type }} \
             --dest target/dist
+
+      - name: Add platform suffix to output filename
+        shell: bash
+        run: |
+          cd target/dist
+          for f in *; do
+            base="${f%.*}"
+            ext="${f##*.}"
+            mv "$f" "${base}-${{ matrix.suffix }}.${ext}"
+          done
+          ls -la
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
