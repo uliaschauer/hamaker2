@@ -22,6 +22,11 @@ jobs:
           - os: macos-latest
             jpackage-type: dmg
             artifact-glob: "target/dist/*.dmg"
+            artifact-name: Hamaker2-macos-arm64
+          - os: macos-15-intel
+            jpackage-type: dmg
+            artifact-glob: "target/dist/*.dmg"
+            artifact-name: Hamaker2-macos-intel          
           - os: ubuntu-latest
             jpackage-type: deb
             artifact-glob: "target/dist/*.deb"
@@ -68,7 +73,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Hamaker2-${{ matrix.os }}
+          name: ${{ matrix.artifact-name }}
           path: ${{ matrix.artifact-glob }}
 
   release:
