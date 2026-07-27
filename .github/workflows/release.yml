@@ -1,0 +1,84 @@
+name: Build & Release
+
+# Runs whenever you push a tag like v2.3.0
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: # lets you trigger it manually from the Actions tab too
+
+permissions:
+  contents: write # needed so the release job can attach files to a GitHub Release
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            jpackage-type: exe
+            artifact-glob: "target/dist/*.exe"
+          - os: macos-latest
+            jpackage-type: dmg
+            artifact-glob: "target/dist/*.dmg"
+          - os: ubuntu-latest
+            jpackage-type: deb
+            artifact-glob: "target/dist/*.deb"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Extract version from tag
+        shell: bash
+        run: |
+          TAG=${GITHUB_REF#refs/tags/v}
+          echo "APP_VERSION=$TAG" >> "$GITHUB_ENV"
+
+      - name: Build jar with Maven
+        run: mvn -B clean package
+
+      - name: Package with jpackage
+        shell: bash
+        run: |
+          mkdir -p target/dist
+          jpackage \
+            --input target \
+            --name Hamaker2 \
+            --main-jar Hamaker2-jar-with-dependencies.jar \
+            --main-class hamaker2.Main \
+            --app-version "${APP_VERSION}" \
+            --vendor "Uli Aschauer" \
+            --type ${{ matrix.jpackage-type }} \
+            --dest target/dist
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hamaker2-${{ matrix.os }}
+          path: ${{ matrix.artifact-glob }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true
